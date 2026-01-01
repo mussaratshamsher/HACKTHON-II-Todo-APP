@@ -1,4 +1,4 @@
-# CLI Todo App
+# Hackathon CLI Todo App
 
 A simple, elegant command-line todo list application that helps you manage your tasks efficiently from the terminal.
 
@@ -18,13 +18,13 @@ A simple, elegant command-line todo list application that helps you manage your 
 ### Install via pip
 
 ```bash
-pip install cli-todo-app
+pip install hackathon-cli-todo
 ```
 
 ### Install via uv (faster)
 
 ```bash
-uv pip install cli-todo-app
+uv pip install hackathon-cli-todo
 ```
 
 ## Usage

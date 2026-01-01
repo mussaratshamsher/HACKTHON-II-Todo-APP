@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "cli-todo-app"
+name = "hackathon-cli-todo"
 version = "0.1.0"
 description = "A simple, elegant command-line todo list application"
 readme = "README.md"
