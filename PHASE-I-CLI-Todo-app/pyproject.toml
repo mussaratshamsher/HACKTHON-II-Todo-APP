@@ -5,9 +5,36 @@ build-backend = "hatchling.build"
 [project]
 name = "cli-todo-app"
 version = "0.1.0"
-description = "A console-based todo list application"
+description = "A simple, elegant command-line todo list application"
+readme = "README.md"
 requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+    { name = "Hackathon II Contributors" }
+]
+keywords = ["todo", "task-manager", "cli", "command-line", "productivity"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business :: Scheduling",
+    "Topic :: Utilities",
+]
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/yourusername/Hackthon-II-Todo-App"
+Repository = "https://github.com/yourusername/Hackthon-II-Todo-App"
+Issues = "https://github.com/yourusername/Hackthon-II-Todo-App/issues"
+
+[project.scripts]
+todo = "src.main:main"
 
 [project.optional-dependencies]
 dev = [
