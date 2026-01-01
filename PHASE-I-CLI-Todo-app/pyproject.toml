@@ -29,9 +29,9 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/yourusername/Hackthon-II-Todo-App"
-Repository = "https://github.com/yourusername/Hackthon-II-Todo-App"
-Issues = "https://github.com/yourusername/Hackthon-II-Todo-App/issues"
+Homepage = "https://github.com/mussaratshamsher/HACKTHON-II-Todo-APP"
+Repository = "https://github.com/mussaratshamsher/HACKTHON-II-Todo-APP"
+Issues = "https://github.com/mussaratshamsher/HACKTHON-II-Todo-APP/issues"
 
 [project.scripts]
 todo = "src.main:main"
