@@ -41,3 +41,14 @@ Use markdown, clear testable language, no code, output only the
   python -m src list
   python -m src complete 1
   python -m src delete 1
+
+  # Publishing as a Package:
+  You will act as expert python developer and will complete the task carefeully according to the        
+  project structure and code files . I want to package this application so that:
+  - It can be installed globally using pip or uv
+  - It exposes a command named `todo`
+  - Running `todo` launches the CLI menu
+  - No database, UI, or cloud services are used   -- Make the changes in app that will work
+  effectively also add steps to installation and using steps for global user in
+  d:\Agentic-Hackthon\Hackthon-II-Todo-App\PHASE-I-CLI-Todo-app\specs\001-cli-todo-app\quickstart.md    
+  -- and guide proper what should i do next

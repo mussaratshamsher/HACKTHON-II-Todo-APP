@@ -23,12 +23,10 @@ Before publishing, update the repository URLs in `pyproject.toml`:
 
 ```toml
 [project.urls]
-Homepage = "https://github.com/YOUR_USERNAME/Hackthon-II-Todo-App"
-Repository = "https://github.com/YOUR_USERNAME/Hackthon-II-Todo-App"
-Issues = "https://github.com/YOUR_USERNAME/Hackthon-II-Todo-App/issues"
+Homepage = "https://github.com/mussaratshamsher/HACKTHON-II-Todo-APP"
+Repository = "https://github.com/mussaratshamsher/HACKTHON-II-Todo-APP/tree/main/PHASE-I-CLI-Todo-app"
+Issues = "https://github.com/mussaratshamsher/Hackthon-II-Todo-App/issues"
 ```
-
-Replace `YOUR_USERNAME` with your actual GitHub username.
 
 ## Build Distribution Packages
 
@@ -131,9 +129,9 @@ python -m twine upload dist/*
 3. Try installing from PyPI:
 
 ```bash
-pip install cli-todo-app
+pip install hackathon-cli-todo
 # OR with uv
-uv pip install cli-todo-app
+uv pip install hackathon-cli-todo
 
 # Test it
 todo --help

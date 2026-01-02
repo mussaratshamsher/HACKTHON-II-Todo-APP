@@ -32,6 +32,14 @@ def parse_args() -> argparse.Namespace:
     delete_parser = subparsers.add_parser("delete", help="Delete a task")
     delete_parser.add_argument("index", type=int, help="Task number to delete")
 
+    # Update command
+    update_parser = subparsers.add_parser("update", help="Update a task title")
+    update_parser.add_argument("index", type=int, help="Task number to update")
+    update_parser.add_argument("title", nargs="+", help="New task title")
+
+    # Clear command
+    subparsers.add_parser("clear", help="Clear all tasks")
+
     return parser.parse_args()
 
 
@@ -60,6 +68,11 @@ def main() -> int:
             return handle_complete(service, args.index)
         case "delete":
             return handle_delete(service, args.index)
+        case "update":
+            title = " ".join(args.title)
+            return handle_update(service, args.index, title)
+        case "clear":
+            return handle_clear(service)
         case _:
             print(f"Unknown command: {args.command}", file=sys.stderr)
             return 1
@@ -84,13 +97,17 @@ def run_menu(service: TodoService) -> int:
                 handle_complete(service, 0)
             case "4" | "delete":
                 handle_delete(service, 0)
-            case "5" | "exit" | "quit":
+            case "5" | "update":
+                handle_update(service, 0, "")
+            case "6" | "clear":
+                handle_clear(service)
+            case "7" | "exit" | "quit":
                 print("Goodbye!")
                 return 0
             case "":
                 continue
             case _:
-                print("Invalid choice. Please enter 1-5.", file=sys.stderr)
+                print("Invalid choice. Please enter 1-7.", file=sys.stderr)
 
 
 def print_menu() -> None:
@@ -100,7 +117,9 @@ def print_menu() -> None:
     print("2. List tasks")
     print("3. Complete a task")
     print("4. Delete a task")
-    print("5. Exit")
+    print("5. Update a task")
+    print("6. Clear all tasks")
+    print("7. Exit")
 
 
 def handle_add(service: TodoService, title: str = "") -> int:
@@ -210,6 +229,62 @@ def handle_delete(service: TodoService, index: int = 0) -> int:
     except IndexOutOfBoundsError as e:
         print(f"Error: {e.message}", file=sys.stderr)
         return 1
+
+
+def handle_update(service: TodoService, index: int = 0, title: str = "") -> int:
+    """Handle updating a task.
+
+    Args:
+        service: The TodoService instance.
+        index: Optional index from command line.
+        title: Optional title from command line.
+
+    Returns:
+        Exit code.
+    """
+    if index <= 0:
+        index_str = input("Enter task number to update: ").strip()
+        if not index_str:
+            print("Please enter a task number.", file=sys.stderr)
+            return 1
+        try:
+            index = int(index_str)
+        except ValueError:
+            print("Invalid task number.", file=sys.stderr)
+            return 1
+
+    if not title:
+        title = input("Enter new task title: ").strip()
+
+    if not title:
+        print("Task title cannot be empty.", file=sys.stderr)
+        return 1
+
+    try:
+        task = service.update_task(index, title)
+        print(f"Updated task: {task.title}")
+        return 0
+    except (IndexOutOfBoundsError, ValidationError) as e:
+        print(f"Error: {e.message}", file=sys.stderr)
+        return 1
+
+
+def handle_clear(service: TodoService) -> int:
+    """Handle clearing all tasks.
+
+    Args:
+        service: The TodoService instance.
+
+    Returns:
+        Exit code.
+    """
+    confirm = input("Are you sure you want to clear all tasks? (y/n): ").strip().lower()
+    if confirm == "y":
+        service.clear_tasks()
+        print("All tasks cleared.")
+        return 0
+    print("Clear operation cancelled.")
+    return 0
 
 
 if __name__ == "__main__":

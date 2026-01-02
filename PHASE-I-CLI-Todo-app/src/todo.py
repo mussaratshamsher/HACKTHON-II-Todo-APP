@@ -83,6 +83,35 @@ class TodoService:
         task = self._get_task_by_index(index)
         self._tasks.remove(task)
 
+    def update_task(self, index: int, new_title: str) -> Task:
+        """Update a task title.
+
+        Args:
+            index: 1-based task index.
+            new_title: The new task title.
+
+        Returns:
+            The updated Task.
+
+        Raises:
+            IndexOutOfBoundsError: If the index is invalid.
+            ValidationError: If the title is empty or invalid.
+        """
+        self._validate_title(new_title)
+        old_task = self._get_task_by_index(index)
+        new_task = Task(
+            id=old_task.id,
+            title=new_title,
+            status=old_task.status,
+            created_at=old_task.created_at,
+        )
+        self._tasks[index - 1] = new_task
+        return new_task
+
+    def clear_tasks(self) -> None:
+        """Remove all tasks."""
+        self._tasks.clear()
+
     def _validate_title(self, title: str) -> None:
         """Validate a task title.
 

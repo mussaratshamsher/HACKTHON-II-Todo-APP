@@ -224,20 +224,30 @@ cd D:\Agentic-Hackthon\Hackthon-II-Todo-App\PHASE-I-CLI-Todo-app
 Install the application globally using pip:
 
 ```bash
-pip install -e .
+pip install hackathon-cli-todo 
+or
+uv pip install hackathon-cli-todo
 ```
-
-*Note: The `-e` flag installs the package in "editable" mode, which means changes to the source code will be immediately reflected without reinstalling.*
 
 ### Step 2: Verify Installation
 
-Check if the `todo` command is available:
+Check if installed successfully:
 
 ```bash
-todo --help
+uv pip show hackathon-cli-todo
+
 ```
 
-You should see the help message with available commands.
+You should see the help message like this:
+
+```bash
+Name: hackathon-cli-todo
+Version: 0.1.0
+Location: D:\Agentic-Hackthon\Hackthon-II-Todo-App\test-todo\.venv\Lib\site-packages        
+Requires:
+Required-by:
+
+```
 
 ### Step 3: Run the Application
 
@@ -284,7 +294,7 @@ pip install -e . --user
 
 **Uninstall the package:**
 ```bash
-pip uninstall cli-todo-app
+pip uninstall hackthon-cli-todo
 ```
 
 ### Reinstalling After Changes
@@ -292,7 +302,7 @@ pip uninstall cli-todo-app
 Since we installed with `-e` flag, changes are automatically picked up. If you need to reinstall:
 
 ```bash
-pip uninstall cli-todo-app
+pip uninstall hackthon-cli-todo
 pip install -e .
 ```
   

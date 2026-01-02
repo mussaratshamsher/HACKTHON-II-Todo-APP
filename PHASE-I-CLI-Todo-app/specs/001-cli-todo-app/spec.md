@@ -79,6 +79,28 @@ As a user, I want to remove tasks from my list so that I can keep only relevant 
 
 ---
 
+### User Story 5 - Update Tasks (Priority: P2)
+
+As a user, I want to modify the title of an existing task so that I can correct mistakes or update task details.
+
+**Acceptance Scenarios**:
+
+1. **Given** a task "Buy milk" exists, **When** the user updates task 1 to "Buy almond milk", **Then** the task list shows task 1 with the new title and its original status.
+
+2. **Given** an invalid task number, **When** attempting to update, **Then** an error message is displayed.
+
+---
+
+### User Story 6 - Clear All Tasks (Priority: P3)
+
+As a user, I want to remove all tasks at once so that I can start fresh.
+
+**Acceptance Scenarios**:
+
+1. **Given** multiple tasks exist, **When** the user clears all tasks, **Then** the task list is empty.
+
+---
+
 ### Edge Cases
 
 - What happens when the user provides special characters in task titles?
@@ -95,7 +117,9 @@ As a user, I want to remove tasks from my list so that I can keep only relevant 
 - **FR-002**: The application MUST display all tasks with their title, completion status, and sequential index.
 - **FR-003**: The application MUST allow users to mark any task by index as completed.
 - **FR-004**: The application MUST allow users to delete any task by index.
-- **FR-005**: The application MUST validate that task titles are non-empty before adding.
+- **FR-010**: The application MUST allow users to update the title of an existing task by index.
+- **FR-011**: The application MUST allow users to clear all tasks at once.
+- **FR-005**: The application MUST validate that task titles are non-empty before adding or updating.
 - **FR-006**: The application MUST validate task indices exist before modifying or deleting.
 - **FR-007**: The application MUST display error messages for invalid operations without crashing.
 - **FR-008**: The application MUST continue running until the user explicitly exits.

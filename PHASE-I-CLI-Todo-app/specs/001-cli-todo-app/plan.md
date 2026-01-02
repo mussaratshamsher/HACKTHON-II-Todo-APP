@@ -5,7 +5,7 @@
 
 ## Summary
 
-A console-based todo list application written in Python 3.13+ using uv for dependency management. The application provides CRUD operations (Add, List, Complete, Delete) for in-memory tasks via a text-based CLI loop. No file I/O, database, or external persistence—data persists only during a single process execution. Target startup <2s, task operations <100ms.
+A console-based todo list application written in Python 3.13+ using uv for dependency management. The application provides CRUD operations (Add, List, Update, Complete, Delete) for in-memory tasks via a text-based CLI loop. No file I/O, database, or external persistence—data persists only during a single process execution. Target startup <2s, task operations <100ms.
 
 ## Technical Context
 
