@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from sqlmodel import SQLModel
 from src.database import engine
 from fastapi.middleware.cors import CORSMiddleware
-from src.api.routes import router
+from src.api.routes import router as todo_router
 import uvicorn
 
 
@@ -42,7 +42,7 @@ app.add_middleware(
 
 
 # Include the todo routes
-app.include_router(router, prefix="/api", tags=["todos"])
+app.include_router(todo_router, prefix="/api", tags=["todos"])
 
 
 @app.get("/")

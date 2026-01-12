@@ -3,13 +3,13 @@ import { apiClient } from './api-client';
 import { Todo, ApiResponse, PaginatedApiResponse } from './types';
 
 export const getTodos = async (): Promise<Todo[]> => {
-  const response: PaginatedApiResponse<Todo> = await apiClient.request('/todos');
-  return Array.isArray(response.data) ? response.data : [];
+  const response: Todo[] = await apiClient.request('/todos');
+  return response;
 };
 
 export const getTodoById = async (id: string): Promise<Todo> => {
-  const response: ApiResponse<Todo> = await apiClient.request(`/todos/${id}`);
-  return response.data;
+  const response: Todo = await apiClient.request(`/todos/${id}`);
+  return response;
 };
 
 export const createTodo = async (todoData: Omit<Todo, 'id' | 'createdAt' | 'updatedAt' | 'completed'>): Promise<Todo> => {
@@ -36,8 +36,10 @@ export const deleteTodo = async (id: string): Promise<boolean> => {
 };
 
 export const toggleTodo = async (id: string): Promise<Todo> => {
-  const response: ApiResponse<Todo> = await apiClient.request(`/todos/${id}/toggle`, {
-    method: 'PATCH',
+  const currentTodo = await getTodoById(id);
+  const response: ApiResponse<Todo> = await apiClient.request(`/todos/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({ ...currentTodo, completed: !currentTodo.completed }),
   });
   return response.data;
 };

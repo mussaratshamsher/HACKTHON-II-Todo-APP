@@ -34,15 +34,15 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onEdit, onDelete, onUpdate })
           aria-label={todo.completed ? 'Mark as incomplete' : 'Mark as complete'}
         />
         <div>
-          <h3 className={`font-medium ${todo.completed ? 'line-through text-gray-500' : 'text-gray-800'}`}>
+          <h3 className={`font-medium ${todo.completed ? 'line-through text-gray-700' : 'text-gray-800'}`}>
             {todo.title}
           </h3>
           {todo.description && (
-            <p className={`text-sm mt-1 ${todo.completed ? 'line-through text-gray-500' : 'text-gray-600'}`}>
+            <p className={`text-sm mt-1 ${todo.completed ? 'line-through text-gray-700' : 'text-gray-800'}`}>
               {todo.description}
             </p>
           )}
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-gray-700 mt-1">
             Created: {new Date(todo.createdAt).toLocaleString()}
           </p>
         </div>

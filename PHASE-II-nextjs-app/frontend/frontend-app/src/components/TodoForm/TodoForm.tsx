@@ -1,10 +1,9 @@
-// TodoForm component for adding and editing todos
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import { Todo } from '@/services/types';
 import { createTodo, updateTodo } from '@/services/todos';
 import { Button } from '../ui/button';
+import toast from 'react-hot-toast';
 
 interface TodoFormProps {
   todo?: Todo;
@@ -27,127 +26,122 @@ const TodoForm: React.FC<TodoFormProps> = ({ todo, onSubmit, onCancel }) => {
 
   const validate = () => {
     const newErrors: { title?: string; description?: string } = {};
-    
+
     if (!title.trim()) {
       newErrors.title = 'Title is required';
-    } else if (title.length < 1 || title.length > 255) {
-      newErrors.title = 'Title must be between 1 and 255 characters';
+    } else if (title.length > 255) {
+      newErrors.title = 'Title must be under 255 characters';
     }
-    
+
     if (description && description.length > 1000) {
-      newErrors.description = 'Description must be less than 1000 characters';
+      newErrors.description = 'Description must be under 1000 characters';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validate()) {
-      return;
-    }
+    if (!validate()) return;
 
     setIsLoading(true);
     try {
-      let updatedTodo: Todo;
-      
-      if (todo) {
-        // Editing existing todo
-        updatedTodo = await updateTodo(todo.id, {
-          title,
-          description: description || undefined,
-        });
-      } else {
-        // Creating new todo
-        updatedTodo = await createTodo({
-          title,
-          description: description || undefined,
-          completed: false,
-        });
-      }
-      
-      onSubmit(updatedTodo);
+      const savedTodo = todo
+        ? await updateTodo(todo.id, { title, description: description || undefined })
+        : await createTodo({ title, description: description || undefined });
+
+      onSubmit(savedTodo);
+      toast.success(todo ? 'Todo updated successfully!' : 'Todo added successfully!');
     } catch (err) {
-      console.error('Failed to save todo:', err);
-      setErrors({ title: 'Failed to save todo. Please try again.' });
+      console.error(err);
+      toast.error('Failed to save todo. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-6 p-4 border rounded-lg bg-gray-50">
-      <h2 className="text-lg font-medium mb-4">
-        {todo ? 'Edit Todo' : 'Add New Todo'}
-      </h2>
-      
-      <div className="mb-4">
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-          Title *
+    <form
+      onSubmit={handleSubmit}
+      className="rounded-2xl bg-white shadow-md border border-gray-100 p-6 space-y-6"
+    >
+      {/* Header */}
+      <div>
+        <h2 className="text-xl font-semibold text-gray-800">
+          {todo ? 'Edit Todo' : 'Create New Todo'}
+        </h2>
+        <p className="text-sm text-gray-800">
+          {todo ? 'Update your task details' : 'Add a new task to stay organized'}
+        </p>
+      </div>
+
+      {/* Title */}
+      <div>
+        <label className="block text-sm font-medium text-gray-800 mb-1">
+          Title <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
-          id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-            errors.title ? 'border-red-500' : 'border-gray-300'
-          }`}
+          placeholder="e.g. Finish project report"
           disabled={isLoading}
-          aria-invalid={!!errors.title}
-          aria-describedby={errors.title ? "title-error" : undefined}
+          className={`w-full rounded-xl px-4 py-3 text-gray-600 text-sm border transition focus:outline-none focus:ring-2 ${
+            errors.title
+              ? 'border-red-500 focus:ring-red-200'
+              : 'border-gray-300 focus:ring-blue-200'
+          }`}
         />
         {errors.title && (
-          <p id="title-error" className="mt-1 text-sm text-red-600">
-            {errors.title}
-          </p>
+          <p className="mt-1 text-sm text-red-600">{errors.title}</p>
         )}
       </div>
-      
-      <div className="mb-4">
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+
+      {/* Description */}
+      <div>
+        <label className="block text-sm font-medium text-gray-800 mb-1">
           Description
         </label>
         <textarea
-          id="description"
+          rows={4}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          rows={3}
-          className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${
-            errors.description ? 'border-red-500' : 'border-gray-300'
+          placeholder="Optional details about this task"
+          disabled={isLoading}
+          className={`w-full rounded-xl px-4 py-3 text-gray-600 text-sm border transition focus:outline-none focus:ring-2 ${
+            errors.description
+              ? 'border-red-500 focus:ring-red-200'
+              : 'border-gray-300 focus:ring-blue-200'
           }`}
-          disabled={isLoading}
-          aria-invalid={!!errors.description}
-          aria-describedby={errors.description ? "description-error" : undefined}
         />
-        {errors.description && (
-          <p id="description-error" className="mt-1 text-sm text-red-600">
-            {errors.description}
-          </p>
-        )}
+        <div className="flex justify-between text-xs text-gray-800 mt-1">
+          <span>{errors.description}</span>
+          <span>{description.length}/1000</span>
+        </div>
       </div>
-      
-      <div className="flex space-x-3">
-        <Button 
-          type="submit" 
-          disabled={isLoading}
-        >
-          {isLoading ? (todo ? 'Updating...' : 'Adding...') : (todo ? 'Update Todo' : 'Add Todo')}
+
+      {/* Actions */}
+      <div className="flex justify-end gap-3 pt-2">
+         <Button type="submit" disabled={isLoading}>
+          {isLoading
+            ? todo
+              ? 'Updating...'
+              : 'Adding...'
+            : todo
+            ? 'Update Todo'
+            : 'Add Todo'}
         </Button>
-        
-        <Button 
-          type="button" 
+        <Button className='bg-gray-500 text-black hover:bg-gra'
+          type="button"
           variant="outline"
           onClick={onCancel}
           disabled={isLoading}
         >
           Cancel
-        </Button>
+        </Button>      
       </div>
     </form>
   );
 };
-
 export default TodoForm;

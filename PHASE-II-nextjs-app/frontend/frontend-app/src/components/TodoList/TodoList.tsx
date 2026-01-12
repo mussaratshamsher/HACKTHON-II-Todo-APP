@@ -8,50 +8,35 @@ import TodoItem from '../TodoItem/TodoItem';
 import { Button } from '../ui/button';
 
 interface TodoListProps {
+  todos: Todo[];
+  loading: boolean;
+  error: string | null;
   onEdit: (todo: Todo) => void;
+  onDelete: (id: string) => Promise<void>;
+  onUpdate: (updatedTodo: Todo) => void;
+  onAddNew?: () => void;
 }
 
-const TodoList: React.FC<TodoListProps> = ({ onEdit }) => {
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const TodoList: React.FC<TodoListProps> = ({
+  todos,
+  loading,
+  error,
+  onEdit,
+  onDelete,
+  onUpdate,
+  onAddNew,
+}) => {
+  console.log('TodoList: Todos prop:', todos); // Debug log
 
-  useEffect(() => {
-    fetchTodos();
-  }, []);
 
-  const fetchTodos = async () => {
-    try {
-      setLoading(true);
-      const fetchedTodos = await getTodos();
-      setTodos(fetchedTodos);
-      setError(null);
-    } catch (err) {
-      console.error('Failed to fetch todos:', err);
-      setError('Failed to load todos. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
+  const handleLocalDelete = async (id: string) => {
+    // Call the onDelete prop directly, which is handled by TodosPage
+    await onDelete(id);
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this todo?')) {
-      try {
-        const success = await deleteTodo(id);
-        if (success) {
-          setTodos(todos.filter(todo => todo.id !== id));
-        }
-      } catch (err) {
-        console.error('Failed to delete todo:', err);
-        setError('Failed to delete todo. Please try again.');
-      }
-    }
-  };
-
-  const handleUpdate = (updatedTodo: Todo) => {
-    setTodos(todos.map(todo => 
-      todo.id === updatedTodo.id ? updatedTodo : todo
-    ));
+  const handleLocalUpdate = (updatedTodo: Todo) => {
+    // Call the onUpdate prop directly, which is handled by TodosPage
+    onUpdate(updatedTodo);
   };
 
   if (loading) {
@@ -64,22 +49,36 @@ const TodoList: React.FC<TodoListProps> = ({ onEdit }) => {
 
   if (todos.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-gray-500">No todos found. Add a new todo to get started!</p>
+      <div className="text-center py-12">
+        <div className="bg-gray-50 rounded-xl p-8 max-w-md mx-auto">
+          <div className="text-5xl mb-4">📝</div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No todos yet</h3>
+          <p className="text-gray-500 mb-4">
+            Get started by adding your first todo task
+          </p>
+          <button
+            onClick={onAddNew}
+            className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+          >
+            Add Your First Todo
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Your Todos</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Your Todos ({todos.length})</h2>
+      </div>
       {todos.map(todo => (
-        <TodoItem 
-          key={todo.id} 
-          todo={todo} 
+        <TodoItem
+          key={todo.id}
+          todo={todo}
           onEdit={onEdit}
-          onDelete={handleDelete}
-          onUpdate={handleUpdate}
+          onDelete={handleLocalDelete}
+          onUpdate={handleLocalUpdate}
         />
       ))}
     </div>

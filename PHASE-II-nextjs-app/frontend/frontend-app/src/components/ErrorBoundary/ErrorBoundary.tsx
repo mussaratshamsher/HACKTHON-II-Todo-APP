@@ -29,7 +29,7 @@ class ErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         <div className="container mx-auto p-4 text-center">
-          <h2 className="text-2xl font-bold text-red-600 mb-4">Something went wrong</h2>
+          <h2 className="text-2xl font-bold text-blue-950 mb-4">There are no todos yet! Add first.</h2>
           <p className="text-gray-600 mb-4">
             {this.state.error?.message || 'An unexpected error occurred'}
           </p>
