@@ -35,11 +35,10 @@ export const deleteTodo = async (id: string): Promise<boolean> => {
   return response.success;
 };
 
-export const toggleTodo = async (id: string): Promise<Todo> => {
-  const currentTodo = await getTodoById(id);
+export const toggleTodo = async (id: string, completed: boolean): Promise<Todo> => {
   const response: ApiResponse<Todo> = await apiClient.request(`/todos/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify({ ...currentTodo, completed: !currentTodo.completed }),
+    method: 'PATCH',
+    body: JSON.stringify({ completed: !completed }),
   });
   return response.data;
 };

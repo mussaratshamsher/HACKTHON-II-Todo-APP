@@ -19,6 +19,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Todo App",
   description: "A simple todo application",
+  icons: {
+    icon: "/favicon.jpg",
+  },
 };
 
 export default function RootLayout({
@@ -33,12 +36,13 @@ export default function RootLayout({
       >
         <Toaster position="top-center" reverseOrder={false} />
         <Navbar />
-        <main className="flex-grow">
+        <main className="flex-grow pt-5 lg:pt-10">
           <ErrorBoundary>
             {children}
           </ErrorBoundary>
+          <Footer />
         </main>
-        <Footer />
+        
       </body>
     </html>
   );

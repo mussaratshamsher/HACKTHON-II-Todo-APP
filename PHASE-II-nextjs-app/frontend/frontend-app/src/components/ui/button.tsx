@@ -1,4 +1,3 @@
-// Basic Button component
 import React from 'react';
 import { cn } from '@/lib/utils';
 
@@ -9,13 +8,16 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'default', size = 'default', ...props }, ref) => {
+    const baseClasses =
+      'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 transform hover:-translate-y-0.5 active:scale-95 shadow-sm hover:shadow-md';
+
     const variantClasses = {
-      default: 'bg-blue-600 text-white hover:bg-blue-700',
+      default: 'bg-primary text-primary-foreground hover:bg-primary/90',
       destructive: 'bg-red-600 text-white hover:bg-red-700',
-      outline: 'border border-gray-300 bg-white hover:bg-gray-100',
-      secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
-      ghost: 'hover:bg-gray-100',
-      link: 'underline-offset-4 hover:underline text-blue-600',
+      outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+      secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+      ghost: 'hover:bg-accent hover:text-accent-foreground',
+      link: 'text-primary underline-offset-4 hover:underline',
     };
 
     const sizeClasses = {
@@ -27,12 +29,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <button
-        className={cn(
-          'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-          variantClasses[variant],
-          sizeClasses[size],
-          className
-        )}
+        className={cn(baseClasses, variantClasses[variant], sizeClasses[size], className)}
         ref={ref}
         {...props}
       />

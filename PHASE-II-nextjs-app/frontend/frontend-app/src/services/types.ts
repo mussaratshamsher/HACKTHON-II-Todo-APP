@@ -5,6 +5,7 @@ export interface Todo {
   title: string;
   description?: string;
   completed: boolean;
+  dueDate?: string; // ISO 8601 datetime string
   createdAt: string; // ISO 8601 datetime string
   updatedAt: string; // ISO 8601 datetime string
 }

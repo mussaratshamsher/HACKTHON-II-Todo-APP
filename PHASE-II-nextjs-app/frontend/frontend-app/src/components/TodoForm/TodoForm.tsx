@@ -4,9 +4,10 @@ import { Todo } from '@/services/types';
 import { createTodo, updateTodo } from '@/services/todos';
 import { Button } from '../ui/button';
 import toast from 'react-hot-toast';
+import { cn } from '@/lib/utils'; // Import cn utility
 
 interface TodoFormProps {
-  todo?: Todo;
+  todo: Todo | null;
   onSubmit: (todo: Todo) => void;
   onCancel: () => void;
 }
@@ -48,7 +49,7 @@ const TodoForm: React.FC<TodoFormProps> = ({ todo, onSubmit, onCancel }) => {
     setIsLoading(true);
     try {
       const savedTodo = todo
-        ? await updateTodo(todo.id, { title, description: description || undefined })
+        ? await updateTodo(todo.id, { title, description: description || undefined, completed: todo.completed })
         : await createTodo({ title, description: description || undefined });
 
       onSubmit(savedTodo);
@@ -64,66 +65,72 @@ const TodoForm: React.FC<TodoFormProps> = ({ todo, onSubmit, onCancel }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl bg-white shadow-md border border-gray-100 p-6 space-y-6"
+      className="rounded-2xl bg-white dark:bg-gray-800 shadow-xl border border-gray-100 dark:border-gray-700 p-4 sm:p-6 space-y-4 sm:space-y-6 fade-in"
     >
       {/* Header */}
       <div>
-        <h2 className="text-xl font-semibold text-gray-800">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-100">
           {todo ? 'Edit Todo' : 'Create New Todo'}
         </h2>
-        <p className="text-sm text-gray-800">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           {todo ? 'Update your task details' : 'Add a new task to stay organized'}
         </p>
       </div>
 
       {/* Title */}
       <div>
-        <label className="block text-sm font-medium text-gray-800 mb-1">
+        <label htmlFor="title" className="block text-sm font-medium text-gray-800 dark:text-gray-100 mb-1">
           Title <span className="text-red-500">*</span>
         </label>
         <input
+          id="title"
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="e.g. Finish project report"
           disabled={isLoading}
-          className={`w-full rounded-xl px-4 py-3 text-gray-600 text-sm border transition focus:outline-none focus:ring-2 ${
+          className={cn(
+            `w-full rounded-xl px-4 py-3 text-gray-800 dark:text-gray-200 text-sm border transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 bg-gray-50 dark:bg-gray-700`,
             errors.title
-              ? 'border-red-500 focus:ring-red-200'
-              : 'border-gray-300 focus:ring-blue-200'
-          }`}
+              ? 'border-red-500 focus:ring-red-300'
+              : 'border-gray-300 dark:border-gray-600 focus:ring-primary/50'
+          )}
         />
         {errors.title && (
-          <p className="mt-1 text-sm text-red-600">{errors.title}</p>
+          <p className="mt-1 text-sm text-red-600 dark:text-red-400 fade-in">{errors.title}</p>
         )}
       </div>
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-gray-800 mb-1">
+        <label htmlFor="description" className="block text-sm font-medium text-gray-800 dark:text-gray-100 mb-1">
           Description
         </label>
         <textarea
+          id="description"
           rows={4}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Optional details about this task"
           disabled={isLoading}
-          className={`w-full rounded-xl px-4 py-3 text-gray-600 text-sm border transition focus:outline-none focus:ring-2 ${
+          className={cn(
+            `w-full rounded-xl px-4 py-3 text-gray-800 dark:text-gray-200 text-sm border transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 bg-gray-50 dark:bg-gray-700`,
             errors.description
-              ? 'border-red-500 focus:ring-red-200'
-              : 'border-gray-300 focus:ring-blue-200'
-          }`}
+              ? 'border-red-500 focus:ring-red-300'
+              : 'border-gray-300 dark:border-gray-600 focus:ring-primary/50'
+          )}
         />
-        <div className="flex justify-between text-xs text-gray-800 mt-1">
-          <span>{errors.description}</span>
+        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+          {errors.description && (
+            <span className="text-red-600 dark:text-red-400 fade-in">{errors.description}</span>
+          )}
           <span>{description.length}/1000</span>
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex justify-end gap-3 pt-2">
-         <Button type="submit" disabled={isLoading}>
+      <div className="flex flex-col sm:flex-row sm:justify-end gap-3 pt-2">
+         <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
           {isLoading
             ? todo
               ? 'Updating...'
@@ -132,11 +139,12 @@ const TodoForm: React.FC<TodoFormProps> = ({ todo, onSubmit, onCancel }) => {
             ? 'Update Todo'
             : 'Add Todo'}
         </Button>
-        <Button className='bg-gray-500 text-black hover:bg-gra'
+        <Button
           type="button"
-          variant="outline"
+          variant="destructive" // Use the destructive variant for cancel
           onClick={onCancel}
           disabled={isLoading}
+          className="w-full sm:w-auto"
         >
           Cancel
         </Button>      

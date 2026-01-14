@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session
 from typing import List
 from src.database import get_session
@@ -8,7 +8,8 @@ from src.services.todo_service import (
     get_todos as get_todos_service,
     get_todo_by_id as get_todo_by_id_service,
     update_todo as update_todo_service,
-    delete_todo as delete_todo_service
+    delete_todo as delete_todo_service,
+    search_todos as search_todos_service # Import search_todos_service
 )
 
 
@@ -66,3 +67,12 @@ def delete_todo_endpoint(
     if not success:
         raise HTTPException(status_code=404, detail="Todo not found")
     return {"message": "Todo deleted successfully"}
+
+
+@router.get("/todos/search", response_model=List[TodoResponse])
+def search_todos_endpoint(
+    q: str = Query(..., min_length=1),
+    session: Session = Depends(get_session)
+):
+    todos = search_todos_service(session, q)
+    return todos

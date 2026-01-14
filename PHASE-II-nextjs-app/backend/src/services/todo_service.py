@@ -1,6 +1,7 @@
 from sqlmodel import Session, select
 from src.models import Todo, TodoCreate, TodoUpdate
 from typing import List, Optional
+from sqlalchemy import or_
 
 
 def create_todo(session: Session, todo: TodoCreate) -> Todo:
@@ -46,3 +47,15 @@ def delete_todo(session: Session, todo_id: int) -> bool:
     session.delete(db_todo)
     session.commit()
     return True
+
+
+def search_todos(session: Session, query: str) -> List[Todo]:
+    search_pattern = f"%{query}%"
+    statement = select(Todo).where(
+        or_(
+            Todo.title.ilike(search_pattern),
+            Todo.description.ilike(search_pattern)
+        )
+    )
+    todos = session.exec(statement).all()
+    return todos

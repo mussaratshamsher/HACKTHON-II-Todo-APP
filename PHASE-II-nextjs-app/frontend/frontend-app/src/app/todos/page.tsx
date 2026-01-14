@@ -1,16 +1,22 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import TodoList from '@/components/TodoList/TodoList';
 import TodoForm from '@/components/TodoForm/TodoForm';
 import { Todo } from '@/services/types';
+import { useSearchParams } from 'next/navigation';
+import { Button } from '@/components/ui/button'; // Import the Button component
+import toast from 'react-hot-toast';
+import { PlusCircle } from 'lucide-react'; // Import PlusCircle icon
 
-const TodosPage = () => {
+const TodosPageContent = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
 
   // Function to fetch todos
   const fetchTodos = async () => {
@@ -18,12 +24,12 @@ const TodosPage = () => {
       setLoading(true);
       const { getTodos } = await import('@/services/todos');
       const fetchedTodos = await getTodos();
-      console.log('TodosPage: Fetched Todos:', fetchedTodos); // Debug log
       setTodos(fetchedTodos);
       setError(null);
     } catch (err) {
       console.error('Failed to fetch todos:', err);
       setError('Failed to load todos. Please try again later.');
+      toast.error('Failed to load todos.');
     } finally {
       setLoading(false);
     }
@@ -33,6 +39,16 @@ const TodosPage = () => {
   useEffect(() => {
     fetchTodos();
   }, []);
+
+  const filteredTodos = useMemo(() => {
+    if (!searchQuery) {
+      return todos;
+    }
+    return todos.filter(todo =>
+      todo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (todo.description && todo.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  }, [todos, searchQuery]);
 
   const handleEdit = (todo: Todo) => {
     setEditingTodo(todo);
@@ -57,10 +73,14 @@ const TodosPage = () => {
         const success = await deleteTodo(id);
         if (success) {
           setTodos(todos.filter(todo => todo.id !== id));
+          toast.success('Todo deleted successfully!');
+        } else {
+          toast.error('Failed to delete todo.');
         }
       } catch (err) {
         console.error('Failed to delete todo:', err);
         setError('Failed to delete todo. Please try again.');
+        toast.error('Failed to delete todo.');
       }
     }
   };
@@ -90,54 +110,50 @@ const TodosPage = () => {
   }, []);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100">
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100
+     dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 py-8">
+      <div className="container mx-auto px-4 md:py-12 max-w-4xl">
 
         {/* Header */}
-        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
+        <header className="flex flex-wrap items-center justify-between gap-4 mb-10 fade-in">
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-800">
-              My Todos
+            <h1 className="text-4xl font-extrabold text-gray-800 dark:text-gray-100 animate-slide-in">
+              My Tasks
             </h1>
-            <p className="text-gray-600">
+            <p className="text-lg text-gray-600 dark:text-gray-300">
               Stay organized and productive
             </p>
           </div>
 
-          <button
+          <Button
             onClick={handleAddNew}
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-xl font-medium shadow-md hover:bg-blue-700 hover:scale-105 transition"
+            className="group outline-2 outline-gray-300 hover:outline-gray-100 duration-500 hover:transform-border"
           >
-            ➕ Add Todo
-          </button>
+            <PlusCircle className="mr-2 h-5 w-5 group-hover:rotate-90 transition-transform duration-200" /> Add New Task
+          </Button>
         </header>
 
         {/* Form Card */}
         {showForm && (
           <section className="mb-8">
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-600 mb-4">
-                {editingTodo ? 'Edit Todo' : 'Create New Todo'}
-              </h2>
-
-              <TodoForm
-                todo={editingTodo}
-                onSubmit={handleFormSubmit}
-                onCancel={handleCancel}
-              />
-            </div>
+            <TodoForm
+              todo={editingTodo}
+              onSubmit={handleFormSubmit}
+              onCancel={handleCancel}
+            />
           </section>
         )}
 
         {/* Todo List Card */}
-        <section>
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Your Tasks
-            </h2>
-
+        <section className="fade-in">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 sm:p-6 border border-gray-100 dark:border-gray-700">
+            {searchQuery && filteredTodos.length === 0 && !loading && (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400 fade-in">
+                No todos found for &quot;{searchQuery}&quot;.
+              </div>
+            )}
             <TodoList
-              todos={todos}
+              todos={filteredTodos}
               loading={loading}
               error={error}
               onEdit={handleEdit}
@@ -151,5 +167,11 @@ const TodosPage = () => {
     </main>
   );
 };
+
+const TodosPage = () => (
+  <Suspense fallback={<div>Loading Todos...</div>}>
+    <TodosPageContent />
+  </Suspense>
+);
 
 export default TodosPage;

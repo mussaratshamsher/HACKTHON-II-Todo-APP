@@ -54,3 +54,33 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
+
+export async function sendCommandToAgent(command: string): Promise<string> {
+  const AGENT_API_URL = 'http://127.0.0.1:8000/api/agent/command';
+
+  try {
+    const response = await fetch(AGENT_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'accept': 'application/json',
+      },
+      body: JSON.stringify({ command, context: {} }),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
+    }
+
+    const data = await response.json();
+    if (!data.assistant_reply) {
+      throw new Error("Invalid response format from agent.");
+    }
+
+    return data.assistant_reply;
+  } catch (error) {
+    console.error(`Agent API request failed: ${AGENT_API_URL}`, error);
+    throw error;
+  }
+}

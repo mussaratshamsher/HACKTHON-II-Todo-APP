@@ -7,6 +7,8 @@ class TodoBase(SQLModel):
     title: str
     description: Optional[str] = None
     completed: bool = False
+    priority: Optional[str] = None # Added priority field
+    due_date: Optional[datetime] = None # Added due_date field
 
 
 class Todo(TodoBase, table=True):
@@ -23,6 +25,8 @@ class TodoUpdate(SQLModel):
     title: Optional[str] = None
     description: Optional[str] = None
     completed: Optional[bool] = None
+    priority: Optional[str] = None # Added priority field
+    due_date: Optional[datetime] = None # Added due_date field
 
 
 class TodoResponse(TodoBase):

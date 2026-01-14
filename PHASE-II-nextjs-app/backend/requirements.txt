@@ -4,3 +4,4 @@ sqlmodel==0.0.16
 psycopg-binary
 uvicorn==0.24.0
 python-dotenv==1.0.0
+dateparser
