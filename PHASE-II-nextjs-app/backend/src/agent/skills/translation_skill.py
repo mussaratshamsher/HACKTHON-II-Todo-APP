@@ -6,7 +6,7 @@ class TranslationSkill(BaseSkill):
     A placeholder skill for handling language translation.
     Currently, it performs a no-op, passing the context through unchanged.
     """
-    def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
         """
         Processes the context for translation.
 

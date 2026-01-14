@@ -7,7 +7,7 @@ class ActionMappingSkill(BaseSkill):
     into a structured action dictionary. It now cleans the task content by removing
     temporal expressions that have been separately processed.
     """
-    def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
         """
         Analyzes the intent and extracted data to form a concrete action and its parameters.
 
@@ -24,7 +24,10 @@ class ActionMappingSkill(BaseSkill):
             content = command
 
             # More robust content extraction by removing trigger phrases
-            triggers = ["create a new todo ", "add a todo ", "add task ", "new todo ", "remind me to "]
+            triggers = [
+                "create a new todo ", "add a todo ", "add a new task ", "add task ", "new todo ", 
+                "add a task ", "create a task ", "new task ", "remind me to "
+            ]
             for trigger in triggers:
                 if command.lower().startswith(trigger):
                     content = command[len(trigger):].strip()

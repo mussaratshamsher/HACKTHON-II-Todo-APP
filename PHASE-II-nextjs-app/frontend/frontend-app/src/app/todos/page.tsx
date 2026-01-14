@@ -18,21 +18,32 @@ const TodosPageContent = () => {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
 
-  // Function to fetch todos
+  // Function to fetch todos with retry mechanism
   const fetchTodos = async () => {
-    try {
-      setLoading(true);
-      const { getTodos } = await import('@/services/todos');
-      const fetchedTodos = await getTodos();
-      setTodos(fetchedTodos);
-      setError(null);
-    } catch (err) {
-      console.error('Failed to fetch todos:', err);
-      setError('Failed to load todos. Please try again later.');
-      toast.error('Failed to load todos.');
-    } finally {
-      setLoading(false);
+    setLoading(true);
+    setError(null); // Clear previous errors
+    const maxRetries = 3;
+    const retryDelay = 1000; // 1 second
+
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        const { getTodos } = await import('@/services/todos');
+        const fetchedTodos = await getTodos();
+        setTodos(fetchedTodos);
+        setLoading(false);
+        return; // Success, exit function
+      } catch (err) {
+        console.error(`Failed to fetch todos (attempt ${i + 1}/${maxRetries}):`, err);
+        if (i < maxRetries - 1) {
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
+      }
     }
+
+    // If all retries fail
+    setError('Failed to load todos after multiple attempts. Please check your connection and try again.');
+    toast.error('Failed to load todos.');
+    setLoading(false);
   };
 
   // Fetch todos on component mount
@@ -127,9 +138,9 @@ const TodosPageContent = () => {
 
           <Button
             onClick={handleAddNew}
-            className="group outline-2 outline-gray-300 hover:outline-gray-100 duration-500 hover:transform-border"
+            className="group outline-2 outline-gray-300 hover:outline-gray-100 text-gray-300 duration-500 hover:transform-border"
           >
-            <PlusCircle className="mr-2 h-5 w-5 group-hover:rotate-90 transition-transform duration-200" /> Add New Task
+            <PlusCircle className="mr-2 h-5 w-5 group-hover:rotate-90 text-green-600 transition-transform duration-200" /> Add New Task
           </Button>
         </header>
 

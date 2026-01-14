@@ -7,7 +7,7 @@ class BaseSkill(ABC):
     All concrete skills must inherit from this class and implement the 'execute' method.
     """
     @abstractmethod
-    def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
         """
         Executes the skill's logic, processes the given context, and returns an updated context.
 

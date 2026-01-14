@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { X, MessageSquare } from 'lucide-react';
+import { sendCommandToAgent } from '../../services/api-client';
 
 interface Message {
   id: number;
@@ -28,7 +29,7 @@ const ResponsiveAgentChat = ({ isOpen, onClose }: ResponsiveAgentChatProps) => {
       setMessages([
         {
           id: 1,
-          text: 'Welcome! Try a command like "add a new todo to buy groceries"',
+          text: 'Welcome! I can help you with your tasks. Try telling me what to do.',
           sender: 'agent',
         },
       ]);
@@ -57,23 +58,13 @@ const ResponsiveAgentChat = ({ isOpen, onClose }: ResponsiveAgentChatProps) => {
     setInput('');
     setIsLoading(true);
 
+
+// ... inside handleSendMessage
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/agent/command', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ command: input, context: {} }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const data = await response.json();
+      const assistant_reply = await sendCommandToAgent(input);
       const agentMessage: Message = {
         id: messages.length + 2,
-        text: data.assistant_reply || 'Sorry, I could not process that.',
+        text: assistant_reply || 'Sorry, I could not process that.',
         sender: 'agent',
       };
 

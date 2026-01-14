@@ -29,10 +29,10 @@ export const updateTodo = async (id: string, todoData: Partial<Todo>): Promise<T
 };
 
 export const deleteTodo = async (id: string): Promise<boolean> => {
-  const response: { success: boolean } = await apiClient.request(`/todos/${id}`, {
+  await apiClient.request(`/todos/${id}`, {
     method: 'DELETE',
   });
-  return response.success;
+  return true;
 };
 
 export const toggleTodo = async (id: string, completed: boolean): Promise<Todo> => {

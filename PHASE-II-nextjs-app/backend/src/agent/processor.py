@@ -31,7 +31,7 @@ class AgentProcessor:
             Dict[str, Any]: The final context after all skills have executed and an action (if any) has been performed.
         """
         for skill in self.skills:
-            context = skill.execute(context)
+            context = await skill.execute(context)
         
         action = context.get("action")
         parameters = context.get("parameters")

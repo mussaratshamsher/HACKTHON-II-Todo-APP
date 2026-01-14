@@ -20,7 +20,10 @@ class AgentResponse(BaseModel):
         action (str): The action identified or taken by the agent.
         parameters (Dict[str, Any]): A dictionary of parameters relevant to the identified action.
         assistant_reply (str): A natural language reply from the assistant.
+        todo_item (Dict[str, Any] | None): The created to-do item, if any.
     """
     action: str
     parameters: Dict[str, Any]
     assistant_reply: str
+    todo_item: Dict[str, Any] | None = None
+

@@ -8,7 +8,7 @@ class TemporalExtractionSkill(BaseSkill):
     using the `dateparser` library. It finds the date/time expression and stores both
     the matched string and the parsed datetime object in the context.
     """
-    def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, context: Dict[str, Any]) -> Dict[str, Any]:
         """
         Parses the command in the context for date and time expressions.
 

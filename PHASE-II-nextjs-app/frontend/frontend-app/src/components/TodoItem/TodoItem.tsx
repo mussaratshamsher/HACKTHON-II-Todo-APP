@@ -69,7 +69,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onEdit, onDelete, onUpdate })
           variant="outline"
           size="sm"
           aria-label="Edit todo"
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto focus- bg-gray-50 focus-ring-2"
         >
           Edit
         </Button>

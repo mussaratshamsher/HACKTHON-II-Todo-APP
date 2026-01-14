@@ -11,21 +11,21 @@ from src.database import get_session
 
 router = APIRouter()
 
+# Instantiate all skills once
+skills = [
+    TranslationSkill(),
+    IntentRecognitionSkill(),
+    RecurrenceExtractionSkill(),
+    TemporalExtractionSkill(),
+    ActionMappingSkill(),
+]
+
+# Instantiate the processor with all skills once
+processor = AgentProcessor(skills=skills)
+
 @router.post("/command", response_model=AgentResponse)
 async def command(request: CommandRequest, session: Session = Depends(get_session)):
     try:
-        # Instantiate all skills
-        skills = [
-            TranslationSkill(),
-            IntentRecognitionSkill(),
-            RecurrenceExtractionSkill(),
-            TemporalExtractionSkill(),
-            ActionMappingSkill(),
-        ]
-        
-        # Instantiate the processor with all skills
-        processor = AgentProcessor(skills=skills)
-        
         # The initial context is the command from the request
         initial_context = {"command": request.command, "context": request.context}
         
@@ -35,12 +35,17 @@ async def command(request: CommandRequest, session: Session = Depends(get_sessio
         return AgentResponse(
             action=result.get("action", "UNKNOWN"),
             parameters=result.get("parameters", {}),
-            assistant_reply=result.get("assistant_reply", "Processing complete.")
+            assistant_reply=result.get("assistant_reply", "Processing complete."),
+            todo_item=result.get("todo_item")
         )
     except HTTPException as e:
+        # Re-raise HTTPException to let FastAPI handle it
         raise e
     except Exception as e:
+        # For any other exception, return a generic 500 error
+        # Log the exception for debugging purposes
+        print(f"Agent processing error: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Agent processing error: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An internal error occurred in the agent."
         )

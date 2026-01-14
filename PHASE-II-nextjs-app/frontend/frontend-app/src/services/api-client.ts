@@ -38,14 +38,35 @@ class ApiClient {
     try {
       const response = await fetch(url, config);
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+            if (!response.ok) {
       
-      const data = await response.json();
-      const camelCaseData = snakeToCamel(data);
-      console.log('API Response (camelCase):', camelCaseData); // Debug log
-      return camelCaseData as T; // Convert response data to camelCase
+              throw new Error(`HTTP error! status: ${response.status}`);
+      
+            }
+      
+            
+      
+            const contentType = response.headers.get('content-type');
+      
+            if (!contentType || !contentType.includes('application/json')) {
+      
+              // If no content type or not JSON, return an empty object or handle as appropriate for the type T
+      
+              // This handles cases like 200 OK with no body (e.g., successful DELETE)
+      
+              return {} as T; 
+      
+            }
+      
+      
+      
+            const data = await response.json();
+      
+            const camelCaseData = snakeToCamel(data);
+      
+            console.log('API Response (camelCase):', camelCaseData); // Debug log
+      
+            return camelCaseData as T;
     } catch (error) {
       console.error(`API request failed: ${url}`, error);
       throw error;

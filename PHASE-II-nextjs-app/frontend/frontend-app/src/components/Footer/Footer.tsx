@@ -19,10 +19,10 @@ const Footer = ({ className }: FooterProps) => {
           &copy; {currentYear} Todo App. All rights reserved.
         </p>
         <div className="flex justify-center space-x-4">
-          <Link href="https://www.linkedin.com/in/mussarat-shamsher-7618a6380/" className="hover:text-blue-200 transition-colors duration-200">
+          <Link href="https://www.linkedin.com/in/mussarat-shamsher-7618a6380/" target='blank' className="hover:text-blue-200 transition-colors duration-200">
             Developer:
           </Link>
-          <Link href="https://mussarat-web-dev.vercel.app/" className="hover:text-blue-200 transition-colors duration-200">
+          <Link href="https://mussarat-web-dev.vercel.app/" target='blank' className="hover:text-blue-200 transition-colors duration-200">
             Mussarat Shamsher
           </Link>
         </div>
