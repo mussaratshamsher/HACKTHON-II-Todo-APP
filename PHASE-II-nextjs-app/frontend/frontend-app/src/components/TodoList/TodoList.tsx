@@ -10,7 +10,7 @@ interface TodoListProps {
   loading: boolean;
   error: string | null;
   onEdit: (todo: Todo) => void;
-  onDelete: (id: string) => Promise<void>;
+  onDelete: (id: number) => Promise<void>;
   onUpdate: (updatedTodo: Todo) => void;
   onAddNew?: () => void;
 }

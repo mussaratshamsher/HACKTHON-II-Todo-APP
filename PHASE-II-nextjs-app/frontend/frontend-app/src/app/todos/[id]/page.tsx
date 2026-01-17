@@ -18,7 +18,7 @@ const TodoDetailPage = () => {
     const fetchTodo = async () => {
       try {
         setLoading(true);
-        const fetchedTodo = await getTodoById(id as string);
+        const fetchedTodo = await getTodoById(Number(id));
         setTodo(fetchedTodo);
         setError(null);
       } catch (err) {

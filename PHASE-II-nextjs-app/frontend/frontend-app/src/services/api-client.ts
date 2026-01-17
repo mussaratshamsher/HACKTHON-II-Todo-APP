@@ -1,6 +1,5 @@
 // Base API client with environment configuration
 import { Todo } from './types';
-import { useAuth } from '@/context/AuthContext';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api';
 
@@ -18,57 +17,55 @@ function snakeToCamel(obj: any): any {
   return obj;
 }
 
-const createApiClient = () => {
-  const { getToken } = useAuth();
+class ApiClient {
+  private baseUrl: string;
+  private token: string | null = null;
 
-  class ApiClient {
-    private baseUrl: string;
-
-    constructor() {
-      this.baseUrl = API_BASE_URL;
-    }
-
-    async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-      const url = `${this.baseUrl}${endpoint}`;
-      const token = await getToken();
-
-      const config: RequestInit = {
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token && { Authorization: `Bearer ${token}` }),
-          ...options.headers,
-        },
-        ...options,
-      };
-
-      try {
-        const response = await fetch(url, config);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const contentType = response.headers.get('content-type');
-        
-        if (!contentType || !contentType.includes('application/json')) {
-          return {} as T; 
-        }
-        
-        const data = await response.json();
-        const camelCaseData = snakeToCamel(data);
-        console.log('API Response (camelCase):', camelCaseData); 
-        return camelCaseData as T;
-      } catch (error) {
-        console.error(`API request failed: ${url}`, error);
-        throw error;
-      }
-    }
+  constructor() {
+    this.baseUrl = API_BASE_URL;
   }
 
-  return new ApiClient();
-};
+  setToken(token: string | null) {
+    this.token = token;
+  }
 
-export const apiClient = createApiClient();
+  async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const url = `${this.baseUrl}${endpoint}`;
+    
+    const config: RequestInit = {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token && { Authorization: `Bearer ${this.token}` }),
+        ...options.headers,
+      },
+      ...options,
+    };
+
+    try {
+      const response = await fetch(url, config);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      
+      if (!contentType || !contentType.includes('application/json')) {
+        return {} as T; 
+      }
+      
+      const data = await response.json();
+      const camelCaseData = snakeToCamel(data);
+      console.log('API Response (camelCase):', camelCaseData); 
+      return camelCaseData as T;
+    } catch (error) {
+      console.error(`API request failed: ${url}`, error);
+      throw error;
+    }
+  }
+}
+
+export const apiClient = new ApiClient();
 
 export async function sendCommandToAgent(command: string): Promise<string> {
   const AGENT_API_URL = 'http://127.0.0.1:8000/api/agent/command';

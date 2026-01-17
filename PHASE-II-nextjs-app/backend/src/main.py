@@ -3,10 +3,11 @@ import firebase_admin
 from firebase_admin import credentials
 from fastapi import FastAPI
 from sqlmodel import SQLModel
-from src.database import engine
+from .database import engine
 from fastapi.middleware.cors import CORSMiddleware
-from src.api.routes import router as todo_router
-from src.api.agent_routes import router as agent_router
+from .api.routes import router as todo_router
+from .api.agent_routes import router as agent_router
+from .api.user_routes import router as user_router
 import uvicorn
 import os
 from dotenv import load_dotenv
@@ -64,6 +65,7 @@ app.add_middleware(
 # Include the todo routes
 app.include_router(todo_router, prefix="/api", tags=["todos"])
 app.include_router(agent_router, prefix="/api/agent", tags=["agent"])
+app.include_router(user_router, prefix="/api/users", tags=["users"])
 
 
 @app.get("/")

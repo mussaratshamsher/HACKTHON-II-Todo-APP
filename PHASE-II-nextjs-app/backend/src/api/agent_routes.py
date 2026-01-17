@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from src.agent.models import CommandRequest, AgentResponse
-from src.agent.processor import AgentProcessor
-from src.agent.skills.translation_skill import TranslationSkill
-from src.agent.skills.intent_recognition_skill import IntentRecognitionSkill
-from src.agent.skills.recurrence_extraction_skill import RecurrenceExtractionSkill
-from src.agent.skills.temporal_extraction_skill import TemporalExtractionSkill
-from src.agent.skills.action_mapping_skill import ActionMappingSkill
 from sqlmodel import Session
-from src.database import get_session
+from ..agent.models import CommandRequest, AgentResponse
+from ..agent.processor import AgentProcessor
+from ..agent.skills.translation_skill import TranslationSkill
+from ..agent.skills.intent_recognition_skill import IntentRecognitionSkill
+from ..agent.skills.recurrence_extraction_skill import RecurrenceExtractionSkill
+from ..agent.skills.temporal_extraction_skill import TemporalExtractionSkill
+from ..agent.skills.action_mapping_skill import ActionMappingSkill
+from ..database import get_session
 
 router = APIRouter()
 

@@ -1,7 +1,7 @@
 // Shared TypeScript types for the Todo application
 
 export interface Todo {
-  id: string;
+  id: number;
   title: string;
   description?: string;
   completed: boolean;

@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 interface TodoItemProps {
   todo: Todo;
   onEdit: (todo: Todo) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: number) => void;
   onUpdate: (updatedTodo: Todo) => void;
 }
 

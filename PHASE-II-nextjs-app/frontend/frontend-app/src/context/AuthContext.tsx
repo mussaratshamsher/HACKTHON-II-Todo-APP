@@ -11,6 +11,7 @@ import {
   GoogleAuthProvider,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { apiClient } from "@/services/api-client";
 
 interface AuthContextType {
   user: User | null;
@@ -19,7 +20,6 @@ interface AuthContextType {
   registerWithEmailAndPassword: typeof createUserWithEmailAndPassword;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
-  getToken: () => Promise<string | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,9 +29,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       setLoading(false);
+      if (user) {
+        const token = await user.getIdToken();
+        apiClient.setToken(token);
+      } else {
+        apiClient.setToken(null);
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -47,17 +53,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
+      // Call the backend logout endpoint
+      await apiClient.post('/users/logout');
+      // Sign out from Firebase
       await signOut(auth);
+      // Clear the token from apiClient
+      apiClient.setToken(null);
     } catch (error) {
       console.error("Error signing out: ", error);
+      // Optionally, handle error, but still attempt client-side sign out
+      await signOut(auth);
+      apiClient.setToken(null);
     }
-  };
-
-  const getToken = async () => {
-    if (user) {
-      return await user.getIdToken();
-    }
-    return null;
   };
 
   return (
@@ -69,7 +76,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         registerWithEmailAndPassword: (email, password) => createUserWithEmailAndPassword(auth, email, password),
         signInWithGoogle,
         logout,
-        getToken,
       }}
     >
       {children}

@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from src.models import Todo, TodoCreate, TodoUpdate
+from ..models import Todo, TodoCreate, TodoUpdate
 from typing import List, Optional
 from sqlalchemy import or_
 

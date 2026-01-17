@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session
 from typing import List
-from src.database import get_session
-from src.models import Todo, TodoCreate, TodoUpdate, TodoResponse
-from src.services.todo_service import (
+from ..database import get_session
+from ..models import Todo, TodoCreate, TodoUpdate, TodoResponse
+from ..services.todo_service import (
     create_todo as create_todo_service,
     get_todos as get_todos_service,
     get_todo_by_id as get_todo_by_id_service,
@@ -11,7 +11,7 @@ from src.services.todo_service import (
     delete_todo as delete_todo_service,
     search_todos as search_todos_service,
 )
-from src.auth.dependencies import get_current_user
+from ..auth.dependencies import get_current_user
 from typing import List
 
 

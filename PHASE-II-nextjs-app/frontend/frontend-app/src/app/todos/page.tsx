@@ -77,7 +77,7 @@ const TodosPageContent = () => {
     await fetchTodos(); // Re-fetch todos after successful submission
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this todo?')) {
       try {
         const { deleteTodo } = await import('@/services/todos');
