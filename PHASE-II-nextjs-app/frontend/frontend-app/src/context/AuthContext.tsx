@@ -53,15 +53,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      // Call the backend logout endpoint
+      // Call the backend logout endpoint first with the current valid token
       await apiClient.post('/users/logout');
-      // Sign out from Firebase
+      // Then sign out from Firebase
       await signOut(auth);
-      // Clear the token from apiClient
+      // Clear the token from apiClient (this will also be done by onAuthStateChanged)
       apiClient.setToken(null);
     } catch (error) {
       console.error("Error signing out: ", error);
-      // Optionally, handle error, but still attempt client-side sign out
+      // Even if backend call fails, attempt client-side sign out
       await signOut(auth);
       apiClient.setToken(null);
     }
