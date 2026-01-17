@@ -179,10 +179,12 @@ const TodosPageContent = () => {
   );
 };
 
+import withAuth from "@/components/withAuth";
+
 const TodosPage = () => (
   <Suspense fallback={<div>Loading Todos...</div>}>
     <TodosPageContent />
   </Suspense>
 );
 
-export default TodosPage;
+export default withAuth(TodosPage);

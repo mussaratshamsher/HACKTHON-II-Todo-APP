@@ -4,19 +4,20 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, X, Menu } from 'lucide-react';
+import { Search, X, Menu, LogIn, User, LogOut } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 interface NavbarProps {
   className?: string;
 }
 
 const Navbar = ({ className }: NavbarProps) => {
+  const { user, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const router = useRouter();
 
-  // Detect scroll
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -34,6 +35,12 @@ const Navbar = ({ className }: NavbarProps) => {
     }
   };
 
+  const handleLogout = async () => {
+    await logout();
+    setIsMenuOpen(false);
+    router.push('/login');
+  };
+
   return (
     <nav
       className={cn(
@@ -44,7 +51,6 @@ const Navbar = ({ className }: NavbarProps) => {
         className
       )}
     >
-      {/* Logo */}
       <div className="text-2xl font-bold tracking-tight">
         <Link
           href="/"
@@ -54,7 +60,6 @@ const Navbar = ({ className }: NavbarProps) => {
         </Link>
       </div>
 
-      {/* Mobile Menu Button */}
       <button
         className="md:hidden p-2 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-white transition-all duration-200"
         onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -63,7 +68,6 @@ const Navbar = ({ className }: NavbarProps) => {
         {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
       </button>
 
-      {/* Menu Content */}
       <div
         className={cn(
           'w-full md:flex md:items-center md:w-auto overflow-hidden transition-all duration-300 ease-in-out',
@@ -72,7 +76,6 @@ const Navbar = ({ className }: NavbarProps) => {
             : 'max-h-0 opacity-0 md:max-h-screen md:opacity-100'
         )}
       >
-        {/* Search */}
         <div className="flex justify-center px-4 my-4 md:my-0 focus:ring-2 focus:ring-primary">
           <form onSubmit={handleSearch} className="w-full max-w-md">
             <div className="relative">
@@ -94,7 +97,6 @@ const Navbar = ({ className }: NavbarProps) => {
           </form>
         </div>
 
-        {/* Links */}
         <div className="flex flex-col md:flex-row md:space-x-6 space-y-3 md:space-y-0 text-center text-lg md:text-base mt-4 md:mt-0">
           <Link
             href="/todos"
@@ -103,6 +105,38 @@ const Navbar = ({ className }: NavbarProps) => {
           >
             My Todos
           </Link>
+          {user ? (
+            <div className="relative group">
+              <button className="flex items-center font-medium hover:text-primary transition-colors duration-200">
+                <User className="h-5 w-5 mr-1" />
+                <span>{user.displayName || user.email}</span>
+              </button>
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20 hidden group-hover:block">
+                <Link
+                  href="/profile"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center font-medium hover:text-primary transition-colors duration-200"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <LogIn className="h-5 w-5 mr-1" />
+              Login
+            </Link>
+          )}
         </div>
       </div>
     </nav>

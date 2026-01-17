@@ -12,8 +12,8 @@ def create_todo(session: Session, todo: TodoCreate) -> Todo:
     return db_todo
 
 
-def get_todos(session: Session, offset: int = 0, limit: int = 100) -> List[Todo]:
-    statement = select(Todo).offset(offset).limit(limit)
+def get_todos(session: Session, user_id: str, offset: int = 0, limit: int = 100) -> List[Todo]:
+    statement = select(Todo).where(Todo.user_id == user_id).offset(offset).limit(limit)
     todos = session.exec(statement).all()
     return todos
 
@@ -49,9 +49,10 @@ def delete_todo(session: Session, todo_id: int) -> bool:
     return True
 
 
-def search_todos(session: Session, query: str) -> List[Todo]:
+def search_todos(session: Session, query: str, user_id: str) -> List[Todo]:
     search_pattern = f"%{query}%"
     statement = select(Todo).where(
+        Todo.user_id == user_id,
         or_(
             Todo.title.ilike(search_pattern),
             Todo.description.ilike(search_pattern)

@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary/ErrorBoundary";
 import { Toaster } from "react-hot-toast";
+import { AuthProvider } from "@/context/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,14 +36,15 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         <Toaster position="top-center" reverseOrder={false} />
-        <Navbar />
-        <main className="flex-grow pt-5 lg:pt-10">
-          <ErrorBoundary>
-            {children}
-          </ErrorBoundary>
-          <Footer />
-        </main>
-        
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-grow pt-5 lg:pt-10">
+            <ErrorBoundary>
+              {children}
+            </ErrorBoundary>
+            <Footer />
+          </main>
+        </AuthProvider>
       </body>
     </html>
   );
