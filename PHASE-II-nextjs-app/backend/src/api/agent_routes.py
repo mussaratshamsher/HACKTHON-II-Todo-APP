@@ -8,6 +8,7 @@ from ..agent.skills.recurrence_extraction_skill import RecurrenceExtractionSkill
 from ..agent.skills.temporal_extraction_skill import TemporalExtractionSkill
 from ..agent.skills.action_mapping_skill import ActionMappingSkill
 from ..database import get_session
+from ..auth.dependencies import get_current_user  # make sure you have this
 
 router = APIRouter()
 
@@ -24,28 +25,64 @@ skills = [
 processor = AgentProcessor(skills=skills)
 
 @router.post("/command", response_model=AgentResponse)
-async def command(request: CommandRequest, session: Session = Depends(get_session)):
+async def command(
+    request: CommandRequest,
+    session: Session = Depends(get_session),
+    current_user: dict = Depends(get_current_user),
+):
+    # 🔐 Ensure user is authenticated
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Login required")
+
+    # ✅ Normalize user ID (Firebase / JWT safe)
+    user_id = current_user.get("id") or current_user.get("uid")
+
+    if not user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid user identity"
+        )
+
     try:
-        # The initial context is the command from the request
-        initial_context = {"command": request.command, "context": request.context}
-        
-        # Process the command, passing the database session
-        result = await processor.process(initial_context, db_session=session)
-        
+        # 🧠 Initial agent context
+        initial_context = {
+            "command": request.command,
+            "context": request.context or {},  # prevent None crash
+            "user_id": user_id,
+        }
+
+        # ⚙️ Process agent command
+        result = await processor.process(
+            initial_context,
+            db_session=session,
+        )
+
+        # 🔗 Attach user to created todo (if any)
+        todo_item = result.get("todo_item")
+        if todo_item:
+            todo_item.user_id = user_id
+
+        # ✅ Clean response
         return AgentResponse(
             action=result.get("action", "UNKNOWN"),
             parameters=result.get("parameters", {}),
-            assistant_reply=result.get("assistant_reply", "Processing complete."),
-            todo_item=result.get("todo_item")
+            assistant_reply=result.get(
+                "assistant_reply",
+                "Processing complete."
+            ),
+            todo_item=todo_item.model_dump() if todo_item else None,
         )
-    except HTTPException as e:
-        # Re-raise HTTPException to let FastAPI handle it
-        raise e
+
+    except HTTPException:
+        raise
+
     except Exception as e:
-        # For any other exception, return a generic 500 error
-        # Log the exception for debugging purposes
-        print(f"Agent processing error: {str(e)}")
+        # 🧪 Debug-friendly logging
+        import traceback
+        print("AGENT PROCESSING ERROR:", str(e))
+        traceback.print_exc()
+
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An internal error occurred in the agent."
+            detail="An internal error occurred in the agent.",
         )

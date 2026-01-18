@@ -130,7 +130,7 @@ const TodoForm: React.FC<TodoFormProps> = ({ todo, onSubmit, onCancel }) => {
 
       {/* Actions */}
       <div className="flex flex-col sm:flex-row sm:justify-end gap-3 pt-2">
-         <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
+         <Button type="submit" disabled={isLoading} className="w-full sm:w-auto bg-blue-700 hover:bg-blue-600">
           {isLoading
             ? todo
               ? 'Updating...'

@@ -21,15 +21,13 @@ load_dotenv(dotenv_path=dotenv_path)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize Firebase Admin SDK
-    cred_json = os.getenv("FIREBASE_API_KEY")
-    if cred_json:
-        cred_dict = json.loads(cred_json)
-        cred = credentials.Certificate(cred_dict)
-        firebase_admin.initialize_app(cred)
-    else:
-        # Fallback for environments where the JSON is not directly in the env var
-        # For example, using Google Cloud's automatic credential discovery
-        firebase_admin.initialize_app()
+    cred_json = os.getenv("FIREBASE_SERVICE_ACCOUNT_KEY_JSON")
+    if not cred_json:
+        raise ValueError("FIREBASE_SERVICE_ACCOUNT_KEY_JSON environment variable not set.")
+    
+    cred_dict = json.loads(cred_json)
+    cred = credentials.Certificate(cred_dict)
+    firebase_admin.initialize_app(cred)
     # Create tables on startup
     SQLModel.metadata.create_all(engine)
     yield

@@ -20,8 +20,7 @@ class Todo(TodoBase, table=True):
 
 
 class TodoCreate(TodoBase):
-    pass
-
+    created_by: Optional[str] = "manual"
 
 class TodoUpdate(SQLModel):
     title: Optional[str] = None

@@ -1,15 +1,14 @@
-// Base API client with environment configuration
+// api-client.ts
 import { Todo } from './types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api';
 
-// Utility function to convert snake_case keys to camelCase
+// --- Utilities ---
 function snakeToCamel(obj: any): any {
-  if (Array.isArray(obj)) {
-    return obj.map(v => snakeToCamel(v));
-  } else if (obj !== null && typeof obj === 'object') {
+  if (Array.isArray(obj)) return obj.map(v => snakeToCamel(v));
+  if (obj !== null && typeof obj === 'object') {
     return Object.keys(obj).reduce((acc, key) => {
-      const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+      const camelKey = key.replace(/_([a-z])/g, (_, g) => g.toUpperCase());
       acc[camelKey] = snakeToCamel(obj[key]);
       return acc;
     }, {} as any);
@@ -17,6 +16,19 @@ function snakeToCamel(obj: any): any {
   return obj;
 }
 
+function camelToSnake(obj: any): any {
+  if (Array.isArray(obj)) return obj.map(v => camelToSnake(v));
+  if (obj !== null && typeof obj === 'object') {
+    return Object.keys(obj).reduce((acc, key) => {
+      const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+      acc[snakeKey] = camelToSnake(obj[key]);
+      return acc;
+    }, {} as any);
+  }
+  return obj;
+}
+
+// --- API Client ---
 class ApiClient {
   private baseUrl: string;
   private token: string | null = null;
@@ -29,70 +41,64 @@ class ApiClient {
     this.token = token;
   }
 
+  setAuthToken(token: string | null) {
+    this.setToken(token);
+  }
+
   async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
+    let body = options.body;
+    if (body && typeof body === 'string') {
+      body = JSON.stringify(camelToSnake(JSON.parse(body)));
+    }
+
     const config: RequestInit = {
+      ...options,
+      body,
       headers: {
         'Content-Type': 'application/json',
         ...(this.token && { Authorization: `Bearer ${this.token}` }),
         ...options.headers,
       },
-      ...options,
     };
 
     try {
       const response = await fetch(url, config);
-      
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
-      
+
       const contentType = response.headers.get('content-type');
-      
-      if (!contentType || !contentType.includes('application/json')) {
-        return {} as T; 
-      }
-      
+      if (!contentType || !contentType.includes('application/json')) return {} as T;
+
       const data = await response.json();
-      const camelCaseData = snakeToCamel(data);
-      console.log('API Response (camelCase):', camelCaseData); 
-      return camelCaseData as T;
+      return snakeToCamel(data) as T;
     } catch (error) {
       console.error(`API request failed: ${url}`, error);
       throw error;
     }
   }
-}
 
-export const apiClient = new ApiClient();
-
-export async function sendCommandToAgent(command: string): Promise<string> {
-  const AGENT_API_URL = 'http://127.0.0.1:8000/api/agent/command';
-
-  try {
-    const response = await fetch(AGENT_API_URL, {
+  async sendAgentCommand(command: string, context: any = {}): Promise<string> {
+    const data = await this.request<{ assistantReply: string }>('/agent/command', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'accept': 'application/json',
-      },
-      body: JSON.stringify({ command, context: {} }),
+      body: JSON.stringify({ command, context }),
     });
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
+    if (!data.assistantReply) {
+      throw new Error('Invalid response format from agent.');
     }
 
-    const data = await response.json();
-    if (!data.assistant_reply) {
-      throw new Error("Invalid response format from agent.");
-    }
-
-    return data.assistant_reply;
-  } catch (error) {
-    console.error(`Agent API request failed: ${AGENT_API_URL}`, error);
-    throw error;
+    return data.assistantReply;
   }
 }
+
+// --- Export singleton ---
+export const apiClient = new ApiClient();
+
+// --- Named export for agent command ---
+export const sendCommandToAgent = (command: string, context: any = {}) =>
+  apiClient.sendAgentCommand(command, context);

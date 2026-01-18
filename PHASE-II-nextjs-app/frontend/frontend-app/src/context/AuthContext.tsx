@@ -49,12 +49,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error("Error signing in with Google: ", error);
     }
-  };
+  }; 
 
   const logout = async () => {
     try {
       // Call the backend logout endpoint first with the current valid token
-      await apiClient.post('/users/logout');
+      await apiClient.request('/users/logout', { method: 'POST' });
       // Then sign out from Firebase
       await signOut(auth);
       // Clear the token from apiClient (this will also be done by onAuthStateChanged)

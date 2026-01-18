@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { X, MessageSquare } from 'lucide-react';
-import { sendCommandToAgent } from '../../services/api-client';
+import { X } from 'lucide-react';
+import { apiClient } from '../../services/api-client';
 
 interface Message {
   id: number;
@@ -41,49 +41,46 @@ const ResponsiveAgentChat = ({ isOpen, onClose }: ResponsiveAgentChatProps) => {
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (input.trim() === '' || isLoading) return;
+    if (!input.trim() || isLoading) return;
 
     const userMessage: Message = {
-      id: messages.length + 1,
+      id: Date.now(),
       text: input,
       sender: 'user',
     };
+
     const loadingMessage: Message = {
-      id: messages.length + 2,
+      id: Date.now() + 1,
       text: '...',
       sender: 'loading',
     };
 
-    setMessages((prevMessages) => [...prevMessages, userMessage, loadingMessage]);
+    setMessages((prev) => [...prev, userMessage, loadingMessage]);
     setInput('');
     setIsLoading(true);
 
-
-// ... inside handleSendMessage
     try {
-      const assistant_reply = await sendCommandToAgent(input);
+      // Use apiClient singleton
+      const assistantReply = await apiClient.sendAgentCommand(input);
+
       const agentMessage: Message = {
-        id: messages.length + 2,
-        text: assistant_reply || 'Sorry, I could not process that.',
+        id: loadingMessage.id,
+        text: assistantReply || 'Sorry, I could not process that.',
         sender: 'agent',
       };
 
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg.id === loadingMessage.id ? agentMessage : msg
-        )
+      setMessages((prev) =>
+        prev.map((msg) => (msg.id === loadingMessage.id ? agentMessage : msg))
       );
     } catch (error) {
-      console.error('There was a problem with the fetch operation:', error);
+      console.error('Agent command error:', error);
       const errorMessage: Message = {
-        id: messages.length + 2,
+        id: loadingMessage.id,
         text: 'Sorry, something went wrong. Please try again.',
         sender: 'agent',
       };
-      setMessages((prevMessages) =>
-        prevMessages.map((msg) =>
-          msg.id === loadingMessage.id ? errorMessage : msg
-        )
+      setMessages((prev) =>
+        prev.map((msg) => (msg.id === loadingMessage.id ? errorMessage : msg))
       );
     } finally {
       setIsLoading(false);
@@ -93,29 +90,30 @@ const ResponsiveAgentChat = ({ isOpen, onClose }: ResponsiveAgentChatProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl w-80 h-96 flex flex-col sm:w-96">
-        <div className="bg-gray-800 text-white p-4 flex justify-between items-center rounded-t-lg">
+    <div className="fixed inset-0 z-50 flex items-end justify-end p-2 sm:p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm sm:max-w-md h-[70vh] sm:h-[500px] flex flex-col">
+        {/* Header */}
+        <div className="bg-gray-800 text-white p-4 flex justify-between items-center rounded-t-xl">
           <h3 className="text-lg font-bold">Agent Chat</h3>
           <button onClick={onClose} className="text-white">
             <X size={24} />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto p-4">
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-2">
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex ${
-                message.sender === 'user' ? 'justify-end' : 'justify-start'
-              } mb-4`}
+              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`rounded-lg px-4 py-2 max-w-xs break-words ${
+                className={`rounded-lg px-3 py-2 max-w-[70%] break-words ${
                   message.sender === 'user'
                     ? 'bg-blue-500 text-white'
                     : message.sender === 'agent'
                     ? 'bg-gray-200 text-gray-800'
-                    : 'bg-gray-100 text-gray-500'
+                    : 'bg-gray-100 text-gray-500 italic'
                 }`}
               >
                 {message.text}
@@ -124,25 +122,25 @@ const ResponsiveAgentChat = ({ isOpen, onClose }: ResponsiveAgentChatProps) => {
           ))}
           <div ref={messagesEndRef} />
         </div>
-        <div className="p-4 border-t">
-          <div className="flex">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="flex-1 rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
-              placeholder="Type your command..."
-              disabled={isLoading}
-            />
-            <button
-              onClick={handleSendMessage}
-              className="bg-blue-500 text-white rounded-r-lg px-4 py-2 hover:bg-blue-600 disabled:bg-blue-300"
-              disabled={isLoading}
-            >
-              {isLoading ? '...' : 'Send'}
-            </button>
-          </div>
+
+        {/* Input */}
+        <div className="p-2 border-t flex">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+            placeholder="Type your command..."
+            disabled={isLoading}
+            className="flex-1 rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+          />
+          <button
+            onClick={handleSendMessage}
+            disabled={isLoading}
+            className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 disabled:bg-blue-300"
+          >
+            {isLoading ? '...' : 'Send'}
+          </button>
         </div>
       </div>
     </div>
@@ -150,3 +148,6 @@ const ResponsiveAgentChat = ({ isOpen, onClose }: ResponsiveAgentChatProps) => {
 };
 
 export default ResponsiveAgentChat;
+// Add this at the bottom of your current file
+export const sendCommandToAgent = (command: string, context: any = {}) =>
+  apiClient.sendAgentCommand(command, context);

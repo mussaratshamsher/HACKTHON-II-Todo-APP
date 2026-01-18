@@ -1,6 +1,7 @@
 // Todo-specific API functions
 import { apiClient } from './api-client';
 import { Todo } from './types';
+import { auth } from '@/lib/firebase';
 
 export const getTodos = async (): Promise<Todo[]> => {
   const response: Todo[] = await apiClient.request('/todos');
@@ -21,8 +22,16 @@ export const createTodo = async (todoData: Omit<Todo, 'id' | 'createdAt' | 'upda
 };
 
 export const updateTodo = async (id: number, todoData: Partial<Todo>): Promise<Todo> => {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+  const token = await user.getIdToken();
   const response: Todo = await apiClient.request(`/todos/${id}`, {
     method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
     body: JSON.stringify(todoData),
   });
   return response;
@@ -36,8 +45,16 @@ export const deleteTodo = async (id: number): Promise<boolean> => {
 };
 
 export const toggleTodo = async (id: number, completed: boolean): Promise<Todo> => {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+  const token = await user.getIdToken();
   const response: Todo = await apiClient.request(`/todos/${id}`, {
     method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
     body: JSON.stringify({ completed: !completed }),
   });
   return response;
