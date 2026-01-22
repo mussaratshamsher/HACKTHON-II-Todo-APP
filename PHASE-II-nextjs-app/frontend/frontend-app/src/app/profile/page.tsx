@@ -66,7 +66,7 @@ const ProfilePage = () => {
       // or signing them out for security reasons.
       // For simplicity, we'll sign them out and redirect to login.
       await signOut(auth);
-      await apiClient.post('/users/logout'); // Inform backend about logout
+      await apiClient.post('/users/logout', {}); // Inform backend about logout
       router.push('/login');
     } catch (error: any) {
       console.error('Error updating password:', error);
@@ -81,7 +81,7 @@ const ProfilePage = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth); // Firebase client-side logout
-      await apiClient.post('/users/logout'); // Backend logout
+      await apiClient.post('/users/logout', {}); // Backend logout
       toast.success('Logged out successfully!');
       router.push('/login');
     } catch (error) {

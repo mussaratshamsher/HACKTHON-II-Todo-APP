@@ -94,6 +94,22 @@ class ApiClient {
 
     return data.assistantReply;
   }
+
+  async get<T>(endpoint: string, options?: RequestInit): Promise<T> {
+    return this.request<T>(endpoint, { ...options, method: 'GET' });
+  }
+
+  async post<T>(endpoint: string, data: any, options?: RequestInit): Promise<T> {
+    return this.request<T>(endpoint, { ...options, method: 'POST', body: JSON.stringify(data) });
+  }
+
+  async put<T>(endpoint: string, data: any, options?: RequestInit): Promise<T> {
+    return this.request<T>(endpoint, { ...options, method: 'PUT', body: JSON.stringify(data) });
+  }
+
+  async delete<T>(endpoint: string, options?: RequestInit): Promise<T> {
+    return this.request<T>(endpoint, { ...options, method: 'DELETE' });
+  }
 }
 
 // --- Export singleton ---

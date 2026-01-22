@@ -9,6 +9,7 @@ import {
   signOut,
   signInWithPopup,
   GoogleAuthProvider,
+  UserCredential,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { apiClient } from "@/services/api-client";
@@ -16,8 +17,8 @@ import { apiClient } from "@/services/api-client";
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  loginWithEmailAndPassword: typeof signInWithEmailAndPassword;
-  registerWithEmailAndPassword: typeof createUserWithEmailAndPassword;
+  loginWithEmailAndPassword: (email: string, password: string) => Promise<UserCredential>;
+  registerWithEmailAndPassword: (email: string, password: string) => Promise<UserCredential>;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 }
