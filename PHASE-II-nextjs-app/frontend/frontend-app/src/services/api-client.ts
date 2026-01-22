@@ -1,8 +1,7 @@
 // api-client.ts
 import { Todo } from './types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api';
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_LOCAL_API_BASE_URL || 'http://localhost:8000/api';
 // --- Utilities ---
 function snakeToCamel(obj: any): any {
   if (Array.isArray(obj)) return obj.map(v => snakeToCamel(v));

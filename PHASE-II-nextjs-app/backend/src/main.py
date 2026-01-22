@@ -41,8 +41,6 @@ app = FastAPI(
 # CORS middleware
 origins = [
     "http://localhost:3000",
-    "http://localhost:3001",
-    "https://hackthon-ii-todo-app.vercel.app/",
     "https://hackthon-ii-todo-app.vercel.app",
 ]
 
