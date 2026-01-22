@@ -9,26 +9,19 @@ from .api.routes import router as todo_router
 from .api.agent_routes import router as agent_router
 from .api.user_routes import router as user_router
 import uvicorn
+import json
 import os
 from dotenv import load_dotenv
-import json
 
-# Load environment variables from .env file
-dotenv_path = os.path.join(os.path.dirname(__file__), '..', '.env')
-load_dotenv(dotenv_path=dotenv_path)
+load_dotenv()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Initialize Firebase Admin SDK
-    cred_json = os.getenv("FIREBASE_SERVICE_ACCOUNT_KEY_JSON")
-    if not cred_json:
-        raise ValueError("FIREBASE_SERVICE_ACCOUNT_KEY_JSON environment variable not set.")
-    
-    cred_dict = json.loads(cred_json)
-    cred = credentials.Certificate(cred_dict)
-    firebase_admin.initialize_app(cred)
-    # Create tables on startup
+    if not firebase_admin._apps:
+        cred = credentials.ApplicationDefault()
+        firebase_admin.initialize_app(cred)
+
     SQLModel.metadata.create_all(engine)
     yield
     # Cleanup on shutdown if needed
@@ -49,6 +42,8 @@ app = FastAPI(
 origins = [
     "http://localhost:3000",
     "http://localhost:3001",
+    "https://hackthon-ii-todo-app.vercel.app/",
+    "https://hackthon-ii-todo-app.vercel.app",
 ]
 
 app.add_middleware(

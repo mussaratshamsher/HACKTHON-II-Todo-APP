@@ -60,7 +60,6 @@ const ResponsiveAgentChat = ({ isOpen, onClose }: ResponsiveAgentChatProps) => {
     setIsLoading(true);
 
     try {
-      // Use apiClient singleton
       const assistantReply = await apiClient.sendAgentCommand(input);
 
       const agentMessage: Message = {
@@ -79,6 +78,7 @@ const ResponsiveAgentChat = ({ isOpen, onClose }: ResponsiveAgentChatProps) => {
         text: 'Sorry, something went wrong. Please try again.',
         sender: 'agent',
       };
+
       setMessages((prev) =>
         prev.map((msg) => (msg.id === loadingMessage.id ? errorMessage : msg))
       );
@@ -90,25 +90,28 @@ const ResponsiveAgentChat = ({ isOpen, onClose }: ResponsiveAgentChatProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-end p-2 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-end p-2 sm:p-4 pb-[env(safe-area-inset-bottom)]">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-sm sm:max-w-md h-[70vh] sm:h-[500px] flex flex-col">
+
         {/* Header */}
-        <div className="bg-gray-800 text-white p-4 flex justify-between items-center rounded-t-xl">
-          <h3 className="text-lg font-bold">Agent Chat</h3>
+        <div className="bg-gray-800 text-white p-3 sm:p-4 flex justify-between items-center rounded-t-xl">
+          <h3 className="text-base sm:text-lg font-bold">Agent Chat</h3>
           <button onClick={onClose} className="text-white">
-            <X size={24} />
+            <X size={22} />
           </button>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-2">
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${
+                message.sender === 'user' ? 'justify-end' : 'justify-start'
+              }`}
             >
               <div
-                className={`rounded-lg px-3 py-2 max-w-[70%] break-words ${
+                className={`rounded-lg px-3 py-2 max-w-[75%] break-words text-sm sm:text-base ${
                   message.sender === 'user'
                     ? 'bg-blue-500 text-white'
                     : message.sender === 'agent'
@@ -124,7 +127,7 @@ const ResponsiveAgentChat = ({ isOpen, onClose }: ResponsiveAgentChatProps) => {
         </div>
 
         {/* Input */}
-        <div className="p-2 border-t flex">
+        <div className="p-2 sm:p-3 border-t flex gap-1">
           <input
             type="text"
             value={input}
@@ -132,12 +135,12 @@ const ResponsiveAgentChat = ({ isOpen, onClose }: ResponsiveAgentChatProps) => {
             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder="Type your command..."
             disabled={isLoading}
-            className="flex-1 rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+            className="flex-1 rounded-lg p-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
           />
           <button
             onClick={handleSendMessage}
             disabled={isLoading}
-            className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 disabled:bg-blue-300"
+            className="bg-blue-500 text-white px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base hover:bg-blue-600 disabled:bg-blue-300"
           >
             {isLoading ? '...' : 'Send'}
           </button>
@@ -148,6 +151,7 @@ const ResponsiveAgentChat = ({ isOpen, onClose }: ResponsiveAgentChatProps) => {
 };
 
 export default ResponsiveAgentChat;
-// Add this at the bottom of your current file
+
+/* Optional helper export */
 export const sendCommandToAgent = (command: string, context: any = {}) =>
   apiClient.sendAgentCommand(command, context);

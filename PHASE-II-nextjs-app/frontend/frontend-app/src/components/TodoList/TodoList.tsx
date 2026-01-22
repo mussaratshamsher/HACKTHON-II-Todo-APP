@@ -65,8 +65,8 @@ const TodoList: React.FC<TodoListProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center px-2">
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Your Todos</h2>
-        <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-semibold">
+        <h2 className="text-2xl font-bold text-blue-500 dark:text-gray-100">Your Todos</h2>
+        <span className="bg-primary/10 text-primary px-3 py-1 text-gray-300 rounded-full text-sm font-semibold">
           {todos.length} {todos.length === 1 ? 'task' : 'tasks'}
         </span>
       </div>

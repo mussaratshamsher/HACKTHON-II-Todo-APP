@@ -5,6 +5,8 @@ import { createTodo, updateTodo } from '@/services/todos';
 import { Button } from '../ui/button';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils'; // Import cn utility
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 interface TodoFormProps {
   todo: Todo | null;
@@ -17,6 +19,8 @@ const TodoForm: React.FC<TodoFormProps> = ({ todo, onSubmit, onCancel }) => {
   const [description, setDescription] = useState(todo?.description || '');
   const [errors, setErrors] = useState<{ title?: string; description?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     if (todo) {
@@ -44,6 +48,11 @@ const TodoForm: React.FC<TodoFormProps> = ({ todo, onSubmit, onCancel }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      toast.error('You must be logged in to create or update a todo.');
+      router.push('/login');
+      return;
+    }
     if (!validate()) return;
 
     setIsLoading(true);
