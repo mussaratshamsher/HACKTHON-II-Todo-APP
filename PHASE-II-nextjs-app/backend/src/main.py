@@ -19,8 +19,16 @@ load_dotenv()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     if not firebase_admin._apps:
-        cred = credentials.ApplicationDefault()
-        firebase_admin.initialize_app(cred)
+        google_creds_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
+        if not google_creds_json:
+            raise ValueError("GOOGLE_CREDENTIALS_JSON environment variable not set.")
+        
+        try:
+            cred_dict = json.loads(google_creds_json)
+            cred = credentials.Certificate(cred_dict)
+            firebase_admin.initialize_app(cred)
+        except json.JSONDecodeError:
+            raise ValueError("Failed to parse GOOGLE_CREDENTIALS_JSON.")
 
     SQLModel.metadata.create_all(engine)
     yield
@@ -42,6 +50,7 @@ app = FastAPI(
 origins = [
     "http://localhost:3000",
     "https://hackthon-ii-todo-app.vercel.app",
+    "https://hackthon-todo-app.up.railway.app/api"
 ]
 
 app.add_middleware(
